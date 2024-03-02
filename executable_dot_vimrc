@@ -1,0 +1,157 @@
+call plug#begin()
+  Plug 'kamykn/spelunker.vim'
+  Plug 'prabirshrestha/vim-lsp'
+"  Plug 'mattn/vim-lsp-settings'
+  Plug 'prabirshrestha/asyncomplete.vim'
+  Plug 'prabirshrestha/asyncomplete-lsp.vim'
+  Plug 'Shougo/ddc.vim'
+  Plug 'shun/ddc-vim-lsp'
+  Plug 'lambdalisue/guise.vim'
+  Plug 'vim-denops/denops.vim'
+  Plug 'vim-denops/denops-helloworld.vim'
+"  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  Plug 'preservim/nerdtree'
+  Plug 'szw/vim-tags'
+  Plug 'majutsushi/tagbar'
+  Plug 'jacquesbh/vim-showmarks'
+  Plug 'vim-scripts/vcscommand.vim'
+  Plug 'Shougo/unite.vim'
+  Plug 'ujihisa/unite-colorscheme'
+  Plug 'rhysd/vim-color-spring-night' 
+  Plug 'whatyouhide/vim-gotham'           " gotham
+  Plug 'altercation/vim-colors-solarized' " solarized
+  Plug 'croaker/mustang-vim'              " mustang
+  Plug 'jeffreyiacono/vim-colors-wombat'  " wombat
+  Plug 'nanotech/jellybeans.vim'          " jellybeans
+  Plug 'vim-scripts/Lucius'               " lucius
+  Plug 'vim-scripts/Zenburn'              " zenburn
+  Plug 'mrkn/mrkn256.vim'                 " mrkn256
+  Plug 'jpo/vim-railscasts-theme'         " railscasts
+  Plug 'therubymug/vim-pyte'              " pyte
+  Plug 'tomasr/molokai'                   " molokai
+  Plug 'chriskempson/vim-tomorrow-theme'  " tomorrow night
+  Plug 'vim-scripts/twilight'             " twilight
+  Plug 'w0ng/vim-hybrid'                  " hybrid
+  Plug 'freeo/vim-kalisi'                 " kalisi
+  Plug 'morhetz/gruvbox'                  " gruvbox
+  Plug 'toupeira/vim-desertink'           " desertink
+  Plug 'sjl/badwolf'                      " badwolf
+  Plug 'itchyny/landscape.vim'            " landscape
+  Plug 'joshdick/onedark.vim'             " onedark in atom
+  Plug 'gosukiwi/vim-atom-dark'           " atom-dark
+  Plug 'vim-airline/vim-airline'
+  Plug 'vim-airline/vim-airline-themes'
+  Plug 'rhysd/clever-f.vim'         " jump to next letter by fxf
+"  Plug 'unblevable/quick-scope' " highlight unique letter to jump by f
+call plug#end()
+let g:airline_powerline_fonts = 1
+set t_Co=256
+colorscheme spring-night
+"colorscheme gotham256
+let g:gotham_airline_emphasised_insert = 0
+
+" powerline font
+let g:airline_theme = 'deus'
+set background=dark
+let g:airline_deus_bg = 'dark'
+let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#branch#enabled = 0
+
+" setting
+set fileformats=unix,dos,mac
+set fileencodings=utf-8,sjis
+set nobackup
+set noswapfile
+set hidden
+set showcmd
+
+set number
+set cursorline
+"highlight CursorLine cterm=underline ctermfg=NONE ctermbg=NONE
+"set virtualedit=onemore
+"set smartindent
+"set visualbell
+let loaded_matchparen = 1
+set laststatus=2
+set wildmode=list:longest
+nnoremap j gj
+nnoremap k gk
+nnoremap <C-]> g<C-]>
+nnoremap <silent> <C-j> :bprev<CR>
+nnoremap <silent> <C-k> :bnext<CR>
+:command -nargs=0 W call Mymake()
+function Mymake()
+  w
+  make
+endfunction
+set list listchars=tab:\▸\-
+set expandtab
+set tabstop=2
+set shiftwidth=2
+
+set ignorecase
+set smartcase
+set incsearch
+set wrapscan
+set hlsearch
+nmap <Esc><Esc> :nohlsearch<CR><Esc>
+
+set tags=tags;~
+
+:command Diff VCSVimDiff
+
+"fzf
+"set rtp+=~/.fzf
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+"source /usr/share/doc/fzf/examples/fzf.vim
+"let $FZF_DEFAULT_COMMAND = 'rg --files'
+
+" tagbar
+nmap <F8> :TagbarToggle<CR>
+let g:tagbar_width = 30
+let g:tagbar_autoshowtag = 1
+
+" show_marks
+augroup show_marks_sync
+  autocmd!
+  autocmd BufReadPost * silent! DoShowMarks
+augroup END
+
+" supertab
+" packloadall
+
+" vim-tags
+let g:vim_tags_project_tags_command = "/usr/bin/ctags -R --exclude=Include.*"
+
+" NERDTree
+nnoremap <silent><C-e> :NERDTreeToggle<CR>
+
+" coc.nvim
+"let g:coc_disable_startup_warning = 1
+"let g:coc_filetype_map = {'tex': 'latex'}
+
+" mattn/vim-lsp-settings
+
+" deno
+let g:denops_disable_version_check = 1
+
+" vertical line cursor
+let &t_SI .= "\e[5 q"
+let &t_EI .= "\e[1 q"
+
+" spelunker
+let g:spelunker_check_type = 2
+" go to previous position
+augroup restore-cursor
+  autocmd!
+  autocmd BufReadPost *
+        \ : if line("'\"") >= 1 && line("'\"") <= line("$")
+        \ |   exe "normal! g`\""
+        \ | endif
+  autocmd BufWinEnter *
+        \ : if empty(&buftype) && line('.') > winheight(0) / 2
+        \ |   execute 'normal! zz'
+        \ | endif
+augroup END
