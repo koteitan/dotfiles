@@ -1,17 +1,17 @@
 call plug#begin()
-  Plug 'kamykn/spelunker.vim'
-  Plug 'prabirshrestha/vim-lsp'
+"  Plug 'kamykn/spelunker.vim'
+"  Plug 'prabirshrestha/vim-lsp'
 "  Plug 'mattn/vim-lsp-settings'
-  Plug 'prabirshrestha/asyncomplete.vim'
-  Plug 'prabirshrestha/asyncomplete-lsp.vim'
-  Plug 'Shougo/ddc.vim'
-  Plug 'shun/ddc-vim-lsp'
+"  Plug 'prabirshrestha/asyncomplete.vim'
+"  Plug 'prabirshrestha/asyncomplete-lsp.vim'
+"  Plug 'Shougo/ddc.vim'
+"  Plug 'shun/ddc-vim-lsp'
   Plug 'lambdalisue/guise.vim'
-  Plug 'vim-denops/denops.vim'
-  Plug 'vim-denops/denops-helloworld.vim'
+"  Plug 'vim-denops/denops.vim'
+"  Plug 'vim-denops/denops-helloworld.vim'
 "  Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'preservim/nerdtree'
-  Plug 'szw/vim-tags'
+"  Plug 'szw/vim-tags'
   Plug 'majutsushi/tagbar'
   Plug 'jacquesbh/vim-showmarks'
   Plug 'vim-scripts/vcscommand.vim'
@@ -43,6 +43,8 @@ call plug#begin()
   Plug 'vim-airline/vim-airline-themes'
   Plug 'rhysd/clever-f.vim'         " jump to next letter by fxf
 "  Plug 'unblevable/quick-scope' " highlight unique letter to jump by f
+  Plug 'wellle/context.vim'               " show context
+  Plug 'Yggdroot/indentLine'              " show indent line
 call plug#end()
 let g:airline_powerline_fonts = 1
 set t_Co=256
@@ -65,7 +67,8 @@ set nobackup
 set noswapfile
 set hidden
 set showcmd
-
+set showmatch
+set matchtime=1
 set number
 set cursorline
 "highlight CursorLine cterm=underline ctermfg=NONE ctermbg=NONE
@@ -123,7 +126,7 @@ augroup END
 " packloadall
 
 " vim-tags
-let g:vim_tags_project_tags_command = "/usr/bin/ctags -R --exclude=Include.*"
+"let g:vim_tags_project_tags_command = "/usr/bin/ctags -R --exclude=Include.*"
 
 " NERDTree
 nnoremap <silent><C-e> :NERDTreeToggle<CR>
@@ -135,14 +138,16 @@ nnoremap <silent><C-e> :NERDTreeToggle<CR>
 " mattn/vim-lsp-settings
 
 " deno
-let g:denops_disable_version_check = 1
+"let g:denops#deno = "deno --unstable"
+" let g:denops_disable_version_check = 1
 
 " vertical line cursor
 let &t_SI .= "\e[5 q"
 let &t_EI .= "\e[1 q"
 
 " spelunker
-let g:spelunker_check_type = 2
+"let g:spelunker_check_type = 2
+
 " go to previous position
 augroup restore-cursor
   autocmd!
@@ -155,3 +160,39 @@ augroup restore-cursor
         \ |   execute 'normal! zz'
         \ | endif
 augroup END
+
+function! SilentMake()
+  write
+  cclose
+
+  let l:make_output = system('make')
+
+  if v:shell_error != 0
+    cgetexpr l:make_output
+    cwindow
+    "wincmd p
+
+    " クイックフィックスリスト内の最初のエラーにジャンプ
+    let l:entry = 1
+    while l:entry <= len(getqflist())
+      if getqflist()[l:entry - 1]['valid'] && getqflist()[l:entry - 1]['type'] == 'E'
+        exec 'cc' l:entry
+        break
+      endif
+      let l:entry += 1
+    endwhile
+
+    echohl ErrorMsg | echo "Build failed." | echohl None
+  else
+    echohl Search | echo "✅ Build succeeded!" | echohl None
+  endif
+endfunction
+
+command! -nargs=* Make call SilentMake()
+
+" context.vim
+let g:context_enabled = 1
+" indentLine
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+let g:indentLine_concealcursor = 'inc'
+let g:indentLine_conceallevel = 2
