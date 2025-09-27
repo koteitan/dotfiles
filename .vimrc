@@ -1,20 +1,20 @@
 call plug#begin()
-"  Plug 'kamykn/spelunker.vim'
-"  Plug 'prabirshrestha/vim-lsp'
+"  Plug 'kamykn/spelunker.vim'                " spell-check
+"  Plug 'prabirshrestha/vim-lsp'             " language server
 "  Plug 'mattn/vim-lsp-settings'
-"  Plug 'prabirshrestha/asyncomplete.vim'
-"  Plug 'prabirshrestha/asyncomplete-lsp.vim'
-"  Plug 'Shougo/ddc.vim'
-"  Plug 'shun/ddc-vim-lsp'
-  Plug 'lambdalisue/guise.vim'
+"  Plug 'prabirshrestha/asyncomplete.vim'     " language server
+"  Plug 'prabirshrestha/asyncomplete-lsp.vim' " language server
+"  Plug 'Shougo/ddc.vim'                      "  deno-powered completion framework
+"  Plug 'shun/ddc-vim-lsp'                    " language server
+  Plug 'lambdalisue/guise.vim'               " open a new tab page rather than invokes a new nested instance 
 "  Plug 'vim-denops/denops.vim'
 "  Plug 'vim-denops/denops-helloworld.vim'
 "  Plug 'neoclide/coc.nvim', {'branch': 'release'}
   Plug 'preservim/nerdtree'
 "  Plug 'szw/vim-tags'
   Plug 'majutsushi/tagbar'
-  Plug 'jacquesbh/vim-showmarks'
-  Plug 'vim-scripts/vcscommand.vim'
+  Plug 'vim-scripts/vcscommand.vim', { 'on': 'VCSVimDiff' } 
+  Plug 'dstein64/vim-startuptime' 
   Plug 'Shougo/unite.vim'
   Plug 'ujihisa/unite-colorscheme'
   Plug 'rhysd/vim-color-spring-night' 
@@ -41,8 +41,8 @@ call plug#begin()
   Plug 'gosukiwi/vim-atom-dark'           " atom-dark
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
-  Plug 'rhysd/clever-f.vim'         " jump to next letter by fxf
-"  Plug 'unblevable/quick-scope' " highlight unique letter to jump by f
+  Plug 'rhysd/clever-f.vim'               " jump to next letter by fxf
+"  Plug 'unblevable/quick-scope'          " highlight unique letter to jump by f
   Plug 'wellle/context.vim'               " show context
   Plug 'Yggdroot/indentLine'              " show indent line
 call plug#end()
@@ -92,6 +92,9 @@ set list listchars=tab:\▸\-
 set expandtab
 set tabstop=2
 set shiftwidth=2
+
+" 改行時にコメント補完を無効化
+autocmd BufEnter * setlocal formatoptions-=c formatoptions-=r
 
 set ignorecase
 set smartcase
@@ -193,6 +196,8 @@ command! -nargs=* Make call SilentMake()
 " context.vim
 let g:context_enabled = 1
 " indentLine
-let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+let g:indentLine_char_list = ['┆']
 let g:indentLine_concealcursor = 'inc'
-let g:indentLine_conceallevel = 2
+let g:indentLine_conceallevel = 0
+autocmd FileType markdown syntax off
+set conceallevel=0

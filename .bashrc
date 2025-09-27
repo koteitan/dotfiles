@@ -1,7 +1,3 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -9,25 +5,27 @@ case $- in
 esac
 
 # don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
 HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
+# append to the history file
 shopt -s histappend
+
+# ignore commands for history
+HISTIGNORE="git restore*:$HISTIGNORE"
+HISTIGNORE="rm -rf*:$HISTIGNORE"
+HISTIGNORE="rm -r*:$HISTIGNORE"
+
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=1000
 HISTFILESIZE=2000
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
+# update the values of LINES and COLUMNS after each command if the window size changed
 shopt -s checkwinsize
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+# use wildcard expansion for ** (recursive globbing)
+shopt -s globstar
 
-# make less more friendly for non-text input files, see lesspipe(1)
+# less can see pdf, etc.
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
@@ -93,22 +91,11 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# bash completion
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -117,16 +104,24 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# git completion
+if [ -f ~/lib/git-completion.bash ]; then
+    . ~/lib/git-completion.bash
+fi
+
 alias vivimrc='vim ~/.vimrc'
 alias vibashrc='vim ~/.bashrc'
 #alias vivimrc='nvim ~/.config/nvim/init.vim'
 #alias vibashrc='nvim ~/.bashrc'
 alias bashrc='source ~/.bashrc'
+alias viwezterm='vim ~/wezterm/wezterm.lua'
+
+alias jaman='LANG=ja_JP.UTF-8 man'
+
 PATH="$PATH":~/bin/
 PATH="$PATH":/opt/nvim/
-
-# go
-PATH="$PATH":/usr/local/go/bin
+export EDITOR=vim
+export VISUAL=vim
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
@@ -137,40 +132,31 @@ export LIBGL_ALWAYS_INDIRECT=1
 alias xterm="xterm -bg '#002244' -fg '#ffffff' -cr '#ff0000' -bd '#ffff00'"
 alias acroread="evince"
 
+set bell-style visible
+
 export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64/bin/javac/usr/lib/jvm/java-17-openjdk-amd64/bin"
 
 hostname -I
 
+# third parties ----------------------------
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+# go
+PATH="$PATH":/usr/local/go/bin
+
 # deno
-export DENO_INSTALL="/home/koteitan/.deno"
+export DENO_INSTALL="$HOME/.deno"
 export PATH="$DENO_INSTALL/bin:$PATH"
 
 # qmk
 #source ~/qmk_utils/activate_wsl.sh
 export PATH="~/.local/bin:$PATH"
 
-
-# nostr
-# noscli
-export mypub=4c5d5379a066339c88f6e101e3edb1fbaee4ede3eea35ffc6f1c664b3a4383ee
-export prirelay=wss://yabu.me
-#export prirelay=wss://relay-jp.nostr.wirednet.jp
-
-#android
-export PATH=$PATH:/usr/local/android-ndk-r26b
-export NDKROOT=/usr/local/android-ndk-r26b
-alias objdump-c626and="$NDKROOT/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-objdump"
-
 # float calc
 pycalc(){
   python -c "print($1)"
 }
 #
-
-#chatgpt
-#export OPENAI_API_KEY=<your-api-key>
 
 #umask
 umask 0022
@@ -181,14 +167,16 @@ export PATH="$HOME/.cargo/bin:$PATH"
 
 alias dusort='du -h --max-depth=1 | sort -h |tee dusort.txt'
 
+# ディレクトリ履歴を保存するファイル
 export DIR_HIST_FILE="$HOME/.dir_history"
 
-# d
+# d コマンド
 function d {
     if [[ ! -f "$DIR_HIST_FILE" ]]; then
         touch "$DIR_HIST_FILE"
     fi
 
+    # 現在のディレクトリを履歴に保存
     if [[ -z "$1" ]]; then
         selected=$(tac "$DIR_HIST_FILE" | fzf --height 40% --reverse --prompt="Select directory: ")
         if [[ -n "$selected" && -d "$selected" ]]; then
@@ -205,5 +193,16 @@ function d {
     fi
 }
 
-alias waitdeploy='wslview $(gh run list --repo koteitan/koteitan.github.io --limit 1 --json url -q ".[0].url")'
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Claude
+alias killclaudes='pkill -f claude'
+
+# private settings
+if [ -f "$HOME/.bashrc_private" ]; then
+    source "$HOME/.bashrc_private"
+fi
 
